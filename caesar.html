@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Caesar Algorithm</title>
+  <style>
+    div{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    button{
+      color: blue;
+      margin-right: 2em;
+    }
+    label{
+      margin-right: 1em;
+    }
+
+    #input{
+      height: 10rem;
+      width: 30rem;
+    }
+
+    textarea{
+      column-width: 30rem;
+
+    }
+
+  </style>
+</head>
+<body>
+  <h1><strong>Caesar</strong></h1>
+    <div>
+      <label for="clave">Clave: </label><input type="number" name="clave" id="clave">
+    </div>
+    <div>
+      <label for="input">Input: </label><textarea  name="text" id="input"></textarea>
+    </div>
+    <div>
+      <button id="Desencriptar" type="submit">Desencriptar</button>
+      <br>
+      <button id="Encriptar" type="submit">Encriptar</button>
+    </div>
+    <div>
+      <label for="salida">Salida</label>
+      <textarea name="salida" id="salida" cols="30" rows="10"></textarea>
+    </div>
+
+  <script>
+
+    function encrypt(alphabet, input, key){
+      let text = input.value;
+      return text.split("").map(
+          letter => encryptLetter(letter, key, alphabet)).join("")
+    }
+
+    function encryptLetter(letter, key, alphabet){
+      if (letter !== " "){
+        return alphabet.charAt((alphabet.indexOf(letter) + key) % alphabet.length).toUpperCase();
+      }
+      return letter;
+    }
+
+    function decryptLetter(letter, key, alphabet){
+      if (letter !== " "){
+        let modulus = ((alphabet.indexOf(letter.toLowerCase()) - key) % alphabet.length);
+        let D = modulus > 0 ? modulus: modulus + alphabet.length;
+        return alphabet.charAt(D);
+      }
+      return letter;
+    }
+
+    function decrypt(alphabet, input, key ){
+      let text = input.value;
+      return text.split("").map(
+          letter => decryptLetter(letter, key, alphabet)).join("");
+    }
+
+    function validateDecryptInput(input){
+
+
+    }
+
+    function main(){
+      let alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+      // Desencriptar
+      document.getElementById("Desencriptar").addEventListener("click", function (){
+
+        document.getElementById("salida").innerHTML = decrypt(alphabet,
+            document.getElementById("input"),
+            parseInt(document.getElementById("clave").value));
+      });
+
+      document.getElementById("Encriptar").addEventListener("click", function (){
+        document.getElementById("salida").innerHTML = encrypt(alphabet,
+            document.getElementById("input"),
+            parseInt(document.getElementById("clave").value));
+        });
+
+    }
+
+    main();
+  </script>
+
+</body>
+</html>
