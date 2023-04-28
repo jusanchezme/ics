@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Caesar Algorithm</title>
   <style>
     div{
@@ -27,79 +28,147 @@
       column-width: 30rem;
 
     }
+    h2{
+      text-align: center;
+    }
 
   </style>
 </head>
 <body>
   <h1><strong>Caesar</strong></h1>
-    <div>
-      <label for="clave">Clave: </label><input type="number" name="clave" id="clave">
-    </div>
-    <div>
-      <label for="input">Input: </label><textarea  name="text" id="input"></textarea>
-    </div>
-    <div>
-      <button id="Desencriptar" type="submit">Desencriptar</button>
-      <br>
-      <button id="Encriptar" type="submit">Encriptar</button>
-    </div>
-    <div>
-      <label for="salida">Salida</label>
-      <textarea name="salida" id="salida" cols="30" rows="10"></textarea>
-    </div>
+  <h2>Alfabeto</h2>
+  <div>
+    <table>
+      <thead></thead>
+      <tbody id="alfabeto"></tbody>
+    </table>
+  </div>
+  <div>
+    <label for="clave">Clave: </label><input type="number" name="clave" id="clave">
+  </div>
+  <div>
+    <label for="input">Input: </label><textarea  name="text" id="input"></textarea>
+  </div>
+  <div>
+    <button id="Descifrar" type="submit">Descifrar</button>
+    <br>
+    <button id="Cifrar" type="submit">Cifrar</button>
+  </div>
+  <h3 id="info"></h3>
+  <div>
+    <label for="salida">Salida</label>
+    <textarea name="salida" id="salida" cols="30" rows="10"></textarea>
+  </div>
 
   <script>
 
-    function encrypt(alphabet, input, key){
-      let text = input.value;
+    function mostrarAlfabeto(alphabet){
+      const table = document.getElementById("alfabeto");
+      let rowLetter = table.insertRow(0);
+      let rowIndex = table.insertRow(1);
+      const array = Array.from(alphabet);
+      for (let i = 0; i < array.length; i++){
+        let letter = rowLetter.insertCell(i);
+        letter.innerHTML = alphabet.charAt(i);
+        let index = rowIndex.insertCell(i);
+        index.innerHTML = i.toString();
+      }
+      /*
+      Array.from(alphabet).forEach(
+          item => {
+            let row = table.insertRow();
+            let letter = row.insertCell(0);
+            letter.innerHTML = item;
+            let index = row.insertCell(1);
+            index.innerHTML = alphabet.indexOf(item);
+          }
+      );
+      */
+    }
+    function cifrar(alphabet, text, key){
       return text.split("").map(
-          letter => encryptLetter(letter, key, alphabet)).join("")
+          letter => cifrarLetra(letter, key, alphabet)).join("")
     }
 
-    function encryptLetter(letter, key, alphabet){
+    function cifrarLetra(letter, key, alphabet){
       if (letter !== " "){
         return alphabet.charAt((alphabet.indexOf(letter) + key) % alphabet.length).toUpperCase();
       }
       return letter;
     }
 
-    function decryptLetter(letter, key, alphabet){
+    function descifrarLetra(letter, key, alphabet){
       if (letter !== " "){
         let modulus = ((alphabet.indexOf(letter.toLowerCase()) - key) % alphabet.length);
-        let D = modulus > 0 ? modulus: modulus + alphabet.length;
+        let D = modulus >= 0 ? modulus: modulus + alphabet.length;
         return alphabet.charAt(D);
       }
       return letter;
     }
 
-    function decrypt(alphabet, input, key ){
-      let text = input.value;
+    function descifrar(alphabet, text, key ){
       return text.split("").map(
-          letter => decryptLetter(letter, key, alphabet)).join("");
+          letter => descifrarLetra(letter, key, alphabet)).join("");
     }
 
-    function validateDecryptInput(input){
-
-
+    function isValidPlainText(text){
+      const regex = /[^a-z\s]+/
+      const replace = text.replace(regex);
+      return (text === replace)
     }
 
+    function isValidCypherText(text){
+      const regex = /[^A-Z\s]+/
+      const replace = text.replace(regex);
+      return (text === replace)
+    }
+
+    function isValidKey(alphabet, key){
+      if (!(key > 0 && key < alphabet.length)){
+        alert("La clave no es valida. Debe ser un número positivo menor que " +
+            alphabet.length.toString())
+        return false;
+      }
+      return true;
+    }
     function main(){
       let alphabet = "abcdefghijklmnopqrstuvwxyz";
+      mostrarAlfabeto(alphabet);
 
-      // Desencriptar
-      document.getElementById("Desencriptar").addEventListener("click", function (){
-
-        document.getElementById("salida").innerHTML = decrypt(alphabet,
-            document.getElementById("input"),
-            parseInt(document.getElementById("clave").value));
+      // Descifrar
+      document.getElementById("Descifrar").addEventListener("click", function (){
+        let info = document.getElementById("info");
+        info.innerHTML = "Procesando";
+        let key = parseInt(document.getElementById("clave").value);
+        let text = document.getElementById("input").value;
+        if (isValidKey(alphabet, key) && isValidCypherText(text)){
+          document.getElementById("salida").innerHTML = descifrar(
+              alphabet,
+              text,
+              key);
+          info.innerHTML = "El texto ha sido descifrado correctamente.";
+        }
+        else {
+          info.innerHTML = "La entrada o clave no es valida";
+        }
       });
 
-      document.getElementById("Encriptar").addEventListener("click", function (){
-        document.getElementById("salida").innerHTML = encrypt(alphabet,
-            document.getElementById("input"),
-            parseInt(document.getElementById("clave").value));
-        });
-
+      // Cifrar
+      document.getElementById("Cifrar").addEventListener("click", function (){
+        let info =  document.getElementById("info");
+        info.innerHTML = "procesando";
+        let key = parseInt(document.getElementById("clave").value);
+        let text = document.getElementById("input").value;
+        if (isValidKey(alphabet, key) && isValidPlainText(text)) {
+          document.getElementById("salida").innerHTML = cifrar(alphabet,
+              text,
+              key);
+          info.innerHTML = "El texto ha sido cifrado correctamente.";
+        }
+        else {
+          info.innerHTML = "La entrada o clave no es valida";
+        }
+      });
     }
 
     main();
