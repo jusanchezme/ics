@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Caesar Algorithm</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
   <style>
     div{
       display: flex;
@@ -11,27 +13,37 @@
       align-items: center;
       margin-bottom: 1rem;
     }
-    button{
-      color: blue;
-      margin-right: 2em;
-    }
     label{
       margin-right: 1em;
     }
 
     #input{
-      height: 10rem;
+      height: 5rem;
       width: 30rem;
     }
 
+    button{
+      margin-top: 1rem;
+      margin-left: 1rem;
+      margin-bottom: 1rem;
+      margin-right: 1rem;
+    }
+
     textarea{
-      column-width: 30rem;
+      column-width: 10rem;
 
     }
     h2{
       text-align: center;
     }
-
+    h3{
+      text-align: center;
+      color:darkblue;
+    }
+    td{
+    border: 1px solid black;
+    }
+    
   </style>
 </head>
 <body>
@@ -50,20 +62,33 @@
     <label for="input">Input: </label><textarea  name="text" id="input"></textarea>
   </div>
   <div>
-    <button id="Descifrar" type="submit">Descifrar</button>
+    <button id="Descifrar" class="btn btn-secondary" type="submit">Descifrar</button>
     <br>
-    <button id="Cifrar" type="submit">Cifrar</button>
+    <button id="Cifrar" class="btn btn-primary" type="submit">Cifrar</button>
   </div>
-  <h3 id="info"></h3>
+  <div>
+    <hr>
+    <h3 id="info"></h3>
+    <hr>
+  </div>
   <div>
     <label for="salida">Salida</label>
-    <textarea name="salida" id="salida" cols="30" rows="10"></textarea>
+    <textarea name="salida" id="salida" cols="30" rows="5"></textarea>
+  </div>
+  <div>
+    <h3 id="mensaje"></h3>
+  </div>
+  <div>
+    <table>
+      <thead></thead>
+      <tbody id="nuevoAlfabeto"></tbody>
+    </table>
+  </div>
   </div>
 
   <script>
 
-    function mostrarAlfabeto(alphabet){
-      const table = document.getElementById("alfabeto");
+    function mostrarAlfabeto(alphabet, table, key = 0){
       let rowLetter = table.insertRow(0);
       let rowIndex = table.insertRow(1);
       const array = Array.from(alphabet);
@@ -71,7 +96,7 @@
         let letter = rowLetter.insertCell(i);
         letter.innerHTML = alphabet.charAt(i);
         let index = rowIndex.insertCell(i);
-        index.innerHTML = i.toString();
+        index.innerHTML = ((i + key) % alphabet.length).toString();
       }
     }
 
@@ -121,9 +146,12 @@
       }
       return true;
     }
+
     function main(){
       let alphabet = "abcdefghijklmnopqrstuvwxyz";
-      mostrarAlfabeto(alphabet);
+
+      const table = document.getElementById("alfabeto");
+      mostrarAlfabeto(alphabet, table);
 
       // Descifrar
       document.getElementById("Descifrar").addEventListener("click", function (){
@@ -154,12 +182,19 @@
               text,
               key);
           info.innerHTML = "El texto ha sido cifrado correctamente.";
+          document.getElementById("mensaje").innerHTML = "Alfabeto con la nueva clave";
+          let table = document.getElementById("nuevoAlfabeto");
+          table.innerHTML = ""
+          mostrarAlfabeto(alphabet, table, key);
         }
         else {
           info.innerHTML = "La entrada o clave no es valida";
         }
       });
+
     }
+
+
 
     main();
   </script>
