@@ -73,32 +73,22 @@
         let index = rowIndex.insertCell(i);
         index.innerHTML = i.toString();
       }
-      /*
-      Array.from(alphabet).forEach(
-          item => {
-            let row = table.insertRow();
-            let letter = row.insertCell(0);
-            letter.innerHTML = item;
-            let index = row.insertCell(1);
-            index.innerHTML = alphabet.indexOf(item);
-          }
-      );
-      */
     }
+
     function cifrar(alphabet, text, key){
       return text.split("").map(
           letter => cifrarLetra(letter, key, alphabet)).join("")
     }
 
     function cifrarLetra(letter, key, alphabet){
-      if (letter !== " "){
+      if (isValidPlainText(letter)){
         return alphabet.charAt((alphabet.indexOf(letter) + key) % alphabet.length).toUpperCase();
       }
       return letter;
     }
 
     function descifrarLetra(letter, key, alphabet){
-      if (letter !== " "){
+      if (isValidCypherText(letter)){
         let modulus = ((alphabet.indexOf(letter.toLowerCase()) - key) % alphabet.length);
         let D = modulus >= 0 ? modulus: modulus + alphabet.length;
         return alphabet.charAt(D);
@@ -112,13 +102,13 @@
     }
 
     function isValidPlainText(text){
-      const regex = /[^a-z\s]+/
+      const regex = /[^a-z]+/
       const replace = text.replace(regex);
       return (text === replace)
     }
 
     function isValidCypherText(text){
-      const regex = /[^A-Z\s]+/
+      const regex = /[^A-Z]+/
       const replace = text.replace(regex);
       return (text === replace)
     }
@@ -141,7 +131,7 @@
         info.innerHTML = "Procesando";
         let key = parseInt(document.getElementById("clave").value);
         let text = document.getElementById("input").value;
-        if (isValidKey(alphabet, key) && isValidCypherText(text)){
+        if (isValidKey(alphabet, key)){
           document.getElementById("salida").innerHTML = descifrar(
               alphabet,
               text,
@@ -159,7 +149,7 @@
         info.innerHTML = "procesando";
         let key = parseInt(document.getElementById("clave").value);
         let text = document.getElementById("input").value;
-        if (isValidKey(alphabet, key) && isValidPlainText(text)) {
+        if (isValidKey(alphabet, key)) {
           document.getElementById("salida").innerHTML = cifrar(alphabet,
               text,
               key);
