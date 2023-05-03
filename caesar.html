@@ -73,17 +73,7 @@
         let index = rowIndex.insertCell(i);
         index.innerHTML = i.toString();
       }
-      /*
-      Array.from(alphabet).forEach(
-          item => {
-            let row = table.insertRow();
-            let letter = row.insertCell(0);
-            letter.innerHTML = item;
-            let index = row.insertCell(1);
-            index.innerHTML = alphabet.indexOf(item);
-          }
-      );
-      */
+
     }
     function cifrar(alphabet, text, key){
       return text.split("").map(
@@ -132,7 +122,12 @@
       return true;
     }
     function main(){
+      
       let alphabet = "abcdefghijklmnopqrstuvwxyz";
+      let digits = "0123456789";
+      let specialCharacters = "áéíóúñäëïöüÿâêîôûàèìòùç";
+      let alphabets = [alphabet, digits, specialCharacters];
+  
       mostrarAlfabeto(alphabet);
 
       // Descifrar
