@@ -148,14 +148,19 @@
       text = text.toUpperCase().replace(" ", "");
       let cleanText = "";
       let length = text.length;
-      let wildcard = "X"
+      let wildcard = "X";
       for (let i = 0; i < text.length; i++){
         const current = text.charAt(i);
         let toAppend = current;
         if (i + 1 < length){
           const next = text.charAt(i+1);
-          toAppend = ((current + next) === "IJ" || current === next) ?
-            current + wildcard : current
+          if ((current + next) === "IJ" || current === next){
+            toAppend = current + wildcard;
+          }
+          else {
+            toAppend = current + next;
+            i++;
+          }
         }
         cleanText += toAppend;
       }
@@ -163,6 +168,11 @@
         cleanText += wildcard;
       }
       return cleanText;
+    }
+    function prepareEncryptedText(text){
+      text = text.toUpperCase().replaceAll(" ", "");
+      text = text.replaceAll("I/J", "I")
+      return text;
     }
 
     function findLetter(matriz, letter){
@@ -207,8 +217,10 @@
       for (let i = 0; i < text.length; i += 2) {
         const digraph = text.charAt(i)+ text.charAt(i + 1);
         encrypted += cipherDigraph(digraph, matriz);
+        console.log("digraph:" +digraph);
+        console.log(encrypted);
       }
-      return encrypted;
+      return encrypted.replaceAll("I/J", "I");
     }
     function decipherDigraph(digraph, matriz){
       let coordFirst = findLetter(matriz, digraph.charAt(0));
@@ -231,13 +243,14 @@
     }
     function decipher(text, matriz){
       console.log(text);
+      text = prepareEncryptedText(text);
       let decrypted = "";
       for (let i = 0; i < text.length; i += 2) {
         const digraph = text.charAt(i)+ text.charAt(i + 1);
         decrypted += decipherDigraph(digraph, matriz);
         console.log(decrypted);
       }
-      return decrypted.toLowerCase();
+      return decrypted.replaceAll("I/J", "I").toLowerCase().replaceAll("ixi", "ii");
     }
 
     function clipBoard(element){
