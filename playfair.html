@@ -50,9 +50,6 @@
     <label for="clave">Clave: </label><input type="text" name="clave" id="clave">
   </div>
   <div>
-    <button id="generateMatriz" type="submit">Generar matriz</button>
-  </div>
-  <div>
     <table>
       <thead></thead>
       <tbody id="matriz"></tbody>
@@ -105,7 +102,7 @@
                 alphabet = alphabet.replace('J','');
             }
             temp.push(letter);
-            if (j == 4){
+            if (j === 4){
                 matriz.push(temp);
                 temp = []
                 j = 0;
@@ -147,72 +144,100 @@
       }
     }
 
-    function cleanText(text){
+    function preparePlainText(text){
       text = text.toUpperCase().replace(" ", "");
-      if (text.length % 2 !== 0){
-        text = text + "X"
-      }
-      for (let i = 0; i< text.length; i++){
-        if (text.substring(i, i + 1) === "IJ") {
-          text.replace("IJ", "IXJ");
+      let cleanText = "";
+      let length = text.length;
+      let wildcard = "X"
+      for (let i = 0; i < text.length; i++){
+        const current = text.charAt(i);
+        let toAppend = current;
+        if (i + 1 < length){
+          const next = text.charAt(i+1);
+          toAppend = ((current + next) === "IJ" || current === next) ?
+            current + wildcard : current
         }
+        cleanText += toAppend;
       }
-      return text;
+      if ((cleanText.length % 2) !== 0){
+        cleanText += wildcard;
+      }
+      return cleanText;
     }
 
+    function findLetter(matriz, letter){
+      letter = letter === "I" || letter === "J" ? "I/J" : letter;
+      for (let row = 0; row < matriz.length; row++){
+        const col = matriz[row].findIndex((element) => element === letter);
+        if (col >= 0 ){
+          return {row, col};
+        }
+      }
+      const row = -1;
+      const col = -1;
+      return {row, col};
+    }
+
+    function sameRowOrColumnCase(rowOrCol, length, cipher = true){
+      return cipher ? (rowOrCol + 1) % length : (rowOrCol + 5 - 1) % length;
+    }
+    function cipherDigraph(digraph, matriz){
+      let coordFirst = findLetter(matriz, digraph.charAt(0));
+      let coordSecond = findLetter(matriz, digraph.charAt(1));
+      let length = matriz.length;
+      if (coordFirst.row === coordSecond.row){
+        return matriz[coordFirst.row][sameRowOrColumnCase(coordFirst.col, length)] +
+            matriz[coordSecond.row][sameRowOrColumnCase(coordSecond.col, length)];
+      }
+      else if (coordFirst.col === coordSecond.col){
+        return matriz[sameRowOrColumnCase(coordFirst.row, length)][coordFirst.col] +
+            matriz[sameRowOrColumnCase(coordSecond.row, length)][coordSecond.col];
+      }
+      else if (coordFirst.row >= 0 && coordSecond.row >= 0){
+        return matriz[coordFirst.row][coordSecond.col] +
+            matriz[coordSecond.row][coordFirst.col];
+      }
+      else
+        return digraph;
+    }
     function cipher(text, matriz){
-      text = cleanText(text);
-     
-      for (i = 0; i < text.length - 1; i +=2){
-        let dupla = text.charAt(i) + text.charAt(i + 1);
-
+      text = preparePlainText(text);
+      console.log(text);
+      let encrypted = "";
+      for (let i = 0; i < text.length; i += 2) {
+        const digraph = text.charAt(i)+ text.charAt(i + 1);
+        encrypted += cipherDigraph(digraph, matriz);
       }
-      return text.split("").map(
-          letter => cipherLetter(letter, key, alphabets)).join("")
+      return encrypted;
     }
-
-    function cipherLetter(letter, key, alphabets){
-      for (const alphabet of alphabets) {
-        if (isValidPlainLetter(letter, alphabet)){
-          return alphabet.charAt((alphabet.indexOf(letter) + key) % alphabet.length).toUpperCase();
-        }
+    function decipherDigraph(digraph, matriz){
+      let coordFirst = findLetter(matriz, digraph.charAt(0));
+      let coordSecond = findLetter(matriz, digraph.charAt(1));
+      let length = matriz.length;
+      if (coordFirst.row === coordSecond.row){
+        return matriz[coordFirst.row][sameRowOrColumnCase(coordFirst.col, length, false)] +
+            matriz[coordSecond.row][sameRowOrColumnCase(coordSecond.col, length, false)];
       }
-      return letter;
-    }
-
-    function decipher(alphabets, text, key){
-      return text.split("").map(
-              letter => decipherLetter(letter, key, alphabets)).join("");
-    }
-
-    function decipherLetter(letter, key, alphabets){
-      for (const alphabet of alphabets) {
-        if (isValidCipherLetter(letter.toLowerCase(), alphabet)){
-          let modulus = ((alphabet.indexOf(letter.toLowerCase()) - key) % alphabet.length);
-          let D = modulus >= 0 ? modulus: modulus + alphabet.length;
-          return alphabet.charAt(D);
-        }
+      else if (coordFirst.col === coordSecond.col){
+        return matriz[sameRowOrColumnCase(coordFirst.row, length, false)][coordFirst.col] +
+            matriz[sameRowOrColumnCase(coordSecond.row, length, false)][coordSecond.col];
       }
-      return letter;
-    }
-
-    function isValidPlainLetter(letter, alphabet){
-      const index = alphabet.indexOf(letter);
-      return alphabet.charAt(index) === letter;
-    }
-
-    function isValidCipherLetter(letter, alphabet){
-      const index = alphabet.indexOf(letter)
-      return alphabet.charAt(index) === letter;
-    }
-
-    function isValidKey(alphabet, key){
-      if (!(key > 0 && key < alphabet.length)){
-        alert("La clave no es valida. Debe ser un número positivo menor que " +
-            alphabet.length.toString())
-        return false;
+      else if (coordFirst.row >= 0 && coordSecond.row >= 0){
+        return matriz[coordFirst.row][coordSecond.col] +
+            matriz[coordSecond.row][coordFirst.col];
       }
-      return true;
+      else
+        return digraph;
+    }
+    function decipher(text, matriz){
+      console.log(text);
+      let decrypted = "";
+      for (let i = 0; i < text.length; i += 2) {
+        const digraph = text.charAt(i)+ text.charAt(i + 1);
+        decrypted += decipherDigraph(digraph, matriz);
+        console.log(decrypted);
+      }
+      return decrypted.toLowerCase();
     }
 
     function clipBoard(element){
@@ -232,66 +257,44 @@
       const alphabet = "abcdefghijklmnopqrstuvwxyz";
       const alphabets = [alphabet];
       const tableNames = ["alphabet"];
-      const tableNamesShifted = ["alphabetShifted"]
-
+      // vienesamicasaenlabodademihijaynisiquieramellamaspadrino
+      //IGFMMGGOVDGWGHQFBHQBIBMSALVZGVFUGZDZZRFGGOFEHIOGXMIBAGOP
       showAlphabets(alphabets, tableNames);
-      let matriz = "";
-      
-      document.getElementById("generateMatriz").addEventListener("click", function () {
-        let key = document.getElementById("clave").value;
-        matriz =  generateMatriz(key);
-        showMatriz(matriz, document.getElementById("matriz"));
-      })
-
       // Cifrar
       document.getElementById("Cifrar").addEventListener("click", function (){
-        let info =  document.getElementById("info");
+        let key = document.getElementById("clave").value;
+        let matriz =  generateMatriz(key);
+        showMatriz(matriz, document.getElementById("matriz"));
+        let info = document.getElementById("info");
         let text = document.getElementById("input").value;
-        document.getElementById("salida").innerHTML = cipher(
-                text,
-                matriz);
-        info.innerHTML = "El texto ha sido cifrado correctamente.";
-        
+        if (text.length > 0 && key.length > 0){
+          document.getElementById("salida").innerHTML = cipher(
+              text,
+              matriz);
+          info.innerHTML = "El texto ha sido cifrado correctamente.";
+        }
+        else {
+          alert("entrada no valida");
+        }
       });
 
-      /*
-      // Descifrar
       document.getElementById("Descifrar").addEventListener("click", function (){
-        let info = document.getElementById("info");
         let key = document.getElementById("clave").value;
+        let matriz =  generateMatriz(key);
+        showMatriz(matriz, document.getElementById("matriz"));
+        let info = document.getElementById("info");
         let text = document.getElementById("input").value;
-        if (isValidKey(alphabet, key)){
+        if (text.length > 0 && key.length > 0){
           document.getElementById("salida").innerHTML = decipher(
-              alphabets,
               text,
-              key);
+              matriz);
           info.innerHTML = "El texto ha sido descifrado correctamente.";
         }
         else {
-          info.innerHTML = "La entrada o clave no es valida";
+          alert("entrada no valida");
         }
       });
 
-      // Cifrar
-      document.getElementById("Cifrar").addEventListener("click", function (){
-        let info =  document.getElementById("info");
-        let key = parseInt(document.getElementById("clave").value);
-        let text = document.getElementById("input").value;
-        if (isValidKey(alphabet, key)) {
-          document.getElementById("salida").innerHTML = cipher(
-                  alphabets,
-                  text,
-                  key);
-          info.innerHTML = "El texto ha sido cifrado correctamente.";
-          document.getElementById("mensaje").innerHTML = "Alfabeto con la nueva clave";
-
-          showAlphabets(alphabets, tableNamesShifted, key);
-        }
-        else {
-          info.innerHTML = "La entrada o clave no es valida";
-        }
-      });
-      */
       //copiar
       document.getElementById("copy").addEventListener("click", function(){
         clipBoard(document.getElementById("salida"));
