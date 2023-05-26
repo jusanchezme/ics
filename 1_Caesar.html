@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Caesar Algorithm</title>
+  <style>
+    div{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    label{
+      margin-right: 1em;
+    }
+    #input{
+      height: 5rem;
+      width: 30rem;
+    }
+    button{
+      margin: 0.5rem;
+    }
+    h2{
+      text-align: center;
+    }
+    h3{
+      text-align: center;
+      color:darkblue;
+    }
+    td{
+      text-align: center;
+      border: 1px solid black;
+      padding-left: 0.3em;
+      padding-right: 0.3em;
+    }
+  </style>
+</head>
+<body>
+  <h1><strong>Caesar</strong></h1>
+  <h2>Alphabets</h2>
+  <div>
+    <table>
+      <thead></thead>
+      <tbody id="alphabet"></tbody>
+    </table>
+  </div>
+  <div>
+    <table>
+      <thead></thead>
+      <tbody id="digits"></tbody>
+    </table>
+  </div>
+  <div>
+    <table>
+      <thead></thead>
+      <tbody id="accentedCharacters"></tbody>
+    </table>
+  </div>
+  <div>
+    <label for="clave">Clave: </label><input type="number" name="clave" id="clave">
+  </div>
+  <div>
+    <label for="input">Input: </label><textarea  name="text" id="input"></textarea>
+  </div>
+  <div>
+    <button id="Descifrar" class="btn btn-secondary" type="submit">Descifrar</button>
+    <br>
+    <button id="Cifrar" class="btn btn-primary" type="submit">Cifrar</button>
+  </div>
+  <div>
+    <hr>
+    <h3 id="info"></h3>
+    <hr>
+  </div>
+  <div>
+    <label for="salida">Salida</label>
+    <textarea name="salida" id="salida" cols="60" rows="5"></textarea>
+    <button id="copy" type="submit">Copiar</button>
+  </div>
+  <div>
+    <h3 id="mensaje"></h3>
+  </div>
+  <div>
+    <table>
+      <thead></thead>
+      <tbody id="alphabetShifted"></tbody>
+    </table>
+  </div>
+  <div>
+    <table>
+      <thead></thead>
+      <tbody id="digitsShifted"></tbody>
+    </table>
+  </div>
+  <div>
+    <table>
+      <thead></thead>
+      <tbody id="accentedCharactersShifted"></tbody>
+    </table>
+  </div>
+
+  <script>
+
+    function showAlphabets(alphabets, tableNames, key = 0){
+      for (let i = 0; i < tableNames.length; i++) {
+        showAlphabet(alphabets[i], document.getElementById(tableNames[i]), key);
+      }
+    }
+
+    function showAlphabet(alphabet, table, key = 0){
+      table.innerHTML = "";
+      let rowLetter = table.insertRow(0);
+      let rowIndex = table.insertRow(1);
+      for (let i = 0; i < alphabet.length; i++){
+        let letter = rowLetter.insertCell(i);
+        letter.innerHTML = alphabet.charAt(i);
+        let index = rowIndex.insertCell(i);
+        index.innerHTML = ((i + key) % alphabet.length).toString();
+      }
+    }
+
+    function cipher(alphabets, text, key){
+      return text.split("").map(
+          letter => cipherLetter(letter, key, alphabets)).join("")
+    }
+
+    function cipherLetter(letter, key, alphabets){
+      for (const alphabet of alphabets) {
+        if (isValidPlainLetter(letter, alphabet)){
+          return alphabet.charAt((alphabet.indexOf(letter) + key) % alphabet.length).toUpperCase();
+        }
+      }
+      return letter;
+    }
+
+    function decipher(alphabets, text, key){
+      return text.split("").map(
+              letter => decipherLetter(letter, key, alphabets)).join("");
+    }
+
+    function decipherLetter(letter, key, alphabets){
+      for (const alphabet of alphabets) {
+        if (isValidCipherLetter(letter.toLowerCase(), alphabet)){
+          let modulus = ((alphabet.indexOf(letter.toLowerCase()) - key) % alphabet.length);
+          let D = modulus >= 0 ? modulus: modulus + alphabet.length;
+          return alphabet.charAt(D);
+        }
+      }
+      return letter;
+    }
+
+    function isValidPlainLetter(letter, alphabet){
+      const index = alphabet.indexOf(letter);
+      return alphabet.charAt(index) === letter;
+    }
+
+    function isValidCipherLetter(letter, alphabet){
+      const index = alphabet.indexOf(letter)
+      return alphabet.charAt(index) === letter;
+    }
+
+    function isValidKey(alphabet, key){
+      if (!(key > 0 && key < alphabet.length)){
+        alert("La clave no es valida. Debe ser un número positivo menor que " +
+            alphabet.length.toString())
+        return false;
+      }
+      return true;
+    }
+
+    function clipBoard(element){
+
+      // Select the text field
+      element.select();
+      element.setSelectionRange(0, 99999); // For mobile devices
+
+      // Copy the text inside the text field
+      navigator.clipboard.writeText(element.value);
+
+      // Alert the copied text
+      alert("Copied the text: " + element.value);
+    }
+
+    function main(){
+      const alphabet = "abcdefghijklmnopqrstuvwxyz";
+      const digits = "0123456789";
+      const accentedCharacters = "áéíóúñäëïöüÿâêîôûàèìòùç";
+      const alphabets = [alphabet, digits, accentedCharacters];
+      const tableNames = ["alphabet", "digits", "accentedCharacters"];
+      const tableNamesShifted = ["alphabetShifted", "digitsShifted", "accentedCharactersShifted"]
+      showAlphabets(alphabets, tableNames);
+
+      // Descifrar
+      document.getElementById("Descifrar").addEventListener("click", function (){
+        let info = document.getElementById("info");
+        let key = parseInt(document.getElementById("clave").value);
+        let text = document.getElementById("input").value;
+        if (isValidKey(alphabet, key)){
+          document.getElementById("salida").innerHTML = decipher(
+              alphabets,
+              text,
+              key);
+          info.innerHTML = "El texto ha sido descifrado correctamente.";
+        }
+        else {
+          info.innerHTML = "La entrada o clave no es valida";
+        }
+      });
+
+      // Cifrar
+      document.getElementById("Cifrar").addEventListener("click", function (){
+        let info =  document.getElementById("info");
+        let key = parseInt(document.getElementById("clave").value);
+        let text = document.getElementById("input").value;
+        if (isValidKey(alphabet, key)) {
+          document.getElementById("salida").innerHTML = cipher(
+                  alphabets,
+                  text,
+                  key);
+          info.innerHTML = "El texto ha sido cifrado correctamente.";
+          document.getElementById("mensaje").innerHTML = "Alfabeto con la nueva clave";
+
+          showAlphabets(alphabets, tableNamesShifted, key);
+        }
+        else {
+          info.innerHTML = "La entrada o clave no es valida";
+        }
+      });
+
+      //copiar
+      document.getElementById("copy").addEventListener("click", function(){
+        clipBoard(document.getElementById("salida"));
+      });
+    }
+
+    main();
+
+  </script>
+
+</body>
+</html>
