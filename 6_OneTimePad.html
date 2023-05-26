@@ -41,6 +41,12 @@
 </nav>
 <div class="container justify-content-center">
     <h2 class="display-2 text-center"> One Time Pad Cipher</h2>
+    <div class="container-md">
+        <table class="table">
+            <thead></thead>
+            <tbody id="alphabet"></tbody>
+        </table>
+    </div>
     <div class="mb-3 py-2">
         <label for="clave" class="form-label fw-bold">Clave </label>
         <input class="form-control" type="text" name="clave" id="clave">
@@ -143,8 +149,22 @@
 
         return letter;
     }
+
+    function showAlphabet(alphabet, table, key = 0){
+        table.innerHTML = "";
+        let rowLetter = table.insertRow(0);
+        let rowIndex = table.insertRow(1);
+        for (let i = 0; i < alphabet.length; i++){
+            let letter = rowLetter.insertCell(i);
+            letter.innerHTML = alphabet.charAt(i);
+            let index = rowIndex.insertCell(i);
+            index.innerHTML = ((i + key) % alphabet.length).toString();
+        }
+    }
     function init() {
-        const alphabet = "abcdefghijklmnopqrstuvwxyz ";
+        const alphabet = "abcdefghijklmnopqrstuvwxyz 0123456789";
+        showAlphabet(alphabet, document.getElementById("alphabet"));
+
         // Cifrar
         document.getElementById("Cifrar").addEventListener("click", function () {
             let key = document.getElementById("clave").value;

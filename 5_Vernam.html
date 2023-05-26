@@ -2,9 +2,198 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vernam Cipher</title>
+  <link rel="stylesheet" href="styles/bootstrap-5.0.2-dist/css/bootstrap.min.css">
+  <script src="styles/bootstrap-5.0.2-dist/js/bootstrap.bundle.js"></script>
 </head>
 <body>
-$END$
+<nav class="navbar navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">Inicio</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="1_Caesar.html">Caesar</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="2_Playfair.html">Playfair</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="3_Hill.html">Hill</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="4_Vigenere.html">Vigenere</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="5_Vernam.html">Vernam</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="6_OneTimePad.html">OneTimePad</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="container justify-content-center">
+  <h2 class="display-2 text-center"> Vernam Cipher</h2>
+  <div class="mb-3 py-2">
+    <label for="clave" class="form-label fw-bold">Clave </label>
+    <input class="form-control" type="text" name="clave" id="clave">
+  </div>
+  <div class="mb-3 py-2">
+    <label for="input" class="form-label fw-bold">Input: </label>
+    <textarea class="form-control" name="text" id="input"></textarea>
+  </div>
+  <div class="d-grid gap-2 col-6 mx-auto">
+    <button id="Descifrar" class="btn btn-secondary" type="submit">Descifrar</button>
+    <button id="Cifrar" class="btn btn-primary" type="submit">Cifrar</button>
+  </div>
+  <div class="mb-3 py-2">
+    <label for="salida" class="form-label">Salida</label>
+    <textarea class="form-control" name="salida" id="salida"></textarea>
+  </div>
+  <div class="d-grid gap-2 col-6 mx-auto">
+    <button class="btn btn-info" id="copy" type="submit">Copiar</button>
+  </div>
+
+  <div>
+    <h3 id="mensaje"></h3>
+  </div>
+</div>
+
+<script>
+
+    function isValidKey(key) {
+        if (!(key.length > 0)) {
+            alert("La clave no es valida")
+            return false;
+        }
+        return true;
+    }
+
+    function clipBoard(element) {
+
+        // Select the text field
+        element.select();
+        element.setSelectionRange(0, 99999); // For mobile devices
+
+        // Copy the text inside the text field
+        navigator.clipboard.writeText(element.value);
+
+        // Alert the copied text
+        alert("Copied the text: " + element.value);
+    }
+
+    function isValidPlainLetter(letter, alphabet) {
+        const index = alphabet.indexOf(letter);
+        return alphabet.charAt(index) === letter;
+    }
+
+    function getXorLetter(letterCharCode, keyCharCode){
+        let xor = [];
+        for (let index = 0; index < letterCharCode.length;index++){
+            xor.push(letterCharCode[index] ^ keyCharCode[index]);
+        }
+        console.log(xor);
+        return String.fromCharCode(parseInt(xor.toString(),2));
+    }
+
+    function cipherLetter(letter, key, index, alphabet) {
+        const indexkeyLetter = index % key.length;
+        if (isValidPlainLetter(letter, alphabet)) {
+            console.log((letter.charCodeAt(0).toString(2)));
+            const letterCharCode = letter.charCodeAt(0).toString(2)
+            const keyCharCode = key.charCodeAt(indexkeyLetter).toString(2);
+            return getXorLetter(letterCharCode, keyCharCode);
+        }
+        return letter;
+    }
+
+    function cipher(text, key, alphabet) {
+        text = text.split("");
+        let result = [];
+        for (let index = 0; index < text.length; index++) {
+            const letter = text[index];
+            result.push(cipherLetter(letter, key, index, alphabet));
+        }
+        console.log(result);
+        return result.join("");
+    }
+
+    function decipher(text, key, alphabet) {
+        text = text.split("");
+        let result = []
+        for (let index = 0; index < text.length; index++) {
+            const letter = text[index];
+            result.push(decipherLetter(letter, key, index, alphabet));
+        }
+        return result.join("");
+    }
+
+    function isValidCipherLetter(letter, alphabet) {
+        const index = alphabet.indexOf(letter)
+        return alphabet.charAt(index) === letter;
+    }
+
+    function decipherLetter(letter, key, index, alphabet) {
+        const indexkeyLetter = index % key.length;
+        letter = letter.toLowerCase();
+
+        if (isValidCipherLetter(letter, alphabet)) {
+            return String.fromCharCode(letter.charCode() ^ key.charCodeAt(indexkeyLetter));
+        }
+
+        return letter;
+    }
+
+    function init() {
+        const alphabet = "abcdefghijklmnopqrstuvwxyz";
+        // Cifrar
+        document.getElementById("Cifrar").addEventListener("click", function () {
+            let key = document.getElementById("clave").value;
+            let text = document.getElementById("input").value;
+            console.log(key);
+            if (isValidKey(key)) {
+                document.getElementById("salida").innerHTML = cipher(
+                    text,
+                    key,
+                    alphabet);
+
+
+            } else {
+                console.log("Error");
+                info.innerHTML = "La entrada o clave no es valida";
+            }
+        });
+
+        // Descifrar
+        document.getElementById("Descifrar").addEventListener("click", function () {
+            let key = document.getElementById("clave").value;
+            let text = document.getElementById("input").value;
+            if (isValidKey(key)) {
+                document.getElementById("salida").innerHTML = decipher(
+                    text,
+                    key,
+                    alphabet);
+                alert("El texto ha sido descifrado correctamente.");
+            } else {
+                alert("La entrada o clave no es valida");
+            }
+        });
+
+        //copiar
+        document.getElementById("copy").addEventListener("click", function () {
+            clipBoard(document.getElementById("salida"));
+        });
+    }
+
+    init();
+
+</script>
 </body>
 </html>
