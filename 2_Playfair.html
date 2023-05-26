@@ -4,78 +4,78 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Playfair Algorithm</title>
-  <style>
-    div{
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    label{
-      margin-right: 1em;
-    }
-    #input{
-      height: 5rem;
-      width: 30rem;
-    }
-    button{
-      margin: 0.5rem;
-    }
-    h2{
-      text-align: center;
-    }
-    h3{
-      text-align: center;
-      color:darkblue;
-    }
-    td{
-      text-align: center;
-      border: 1px solid black;
-      padding-left: 0.3em;
-      padding-right: 0.3em;
-    }
-  </style>
+  <link rel="stylesheet" href="styles/bootstrap-5.0.2-dist/css/bootstrap.min.css">
+  <script src="styles/bootstrap-5.0.2-dist/js/bootstrap.bundle.js"></script>
 </head>
 <body>
-  <h1><strong>Playfair</strong></h1>
-  <h2>Alphabets</h2>
+<nav class="navbar navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">Inicio</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="1_Caesar.html">Caesar</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="2_Playfair.html">Playfair</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="3_Hill.html">Hill</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="4_Vigenere.html">Vigenere</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="5_Vernam.html">Vernam</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="6_OneTimePad.html">OneTimePad</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="container justify-content-center">
+  <h2 class="display-2 text-center"> Playfair</h2>
+  <h4 class="text-center">Alphabet</h4>
   <div>
-    <table>
+    <table class="table">
       <thead></thead>
       <tbody id="alphabet"></tbody>
     </table>
   </div>
-
-  <div>
-    <label for="clave">Clave: </label><input type="text" name="clave" id="clave">
+  <div class="mb-3 py-1">
+    <label for="clave" class="form-label fw-bold">Clave </label>
+    <input class="form-control" type="text" name="clave" id="clave">
   </div>
-  <div>
-    <table>
+  <div class="container-sm">
+    <table class="table">
       <thead></thead>
       <tbody id="matriz"></tbody>
     </table>
   </div>
-  <div>
-    <label for="input">Input: </label><textarea  name="text" id="input"></textarea>
+  <div class="mb-3 py-1">
+    <label for="input" class="form-label fw-bold">Input: </label>
+    <textarea class="form-control" name="text" id="input"></textarea>
   </div>
-  <div>
+  <div class="d-grid gap-2 col-6 mx-auto">
     <button id="Descifrar" class="btn btn-secondary" type="submit">Descifrar</button>
-    <br>
     <button id="Cifrar" class="btn btn-primary" type="submit">Cifrar</button>
   </div>
-  <div>
-    <hr>
-    <h3 id="info"></h3>
-    <hr>
+  <h4 class="text-center" id="Info"></h4>
+  <div class="mb-3 py-2">
+    <label for="salida" class="form-label">Salida</label>
+    <textarea class="form-control" name="salida" id="salida"></textarea>
   </div>
-  <div>
-    <label for="salida">Salida</label>
-    <textarea name="salida" id="salida" cols="60" rows="5"></textarea>
-    <button id="copy" type="submit">Copiar</button>
+  <div class="d-grid gap-2 col-6 mx-auto">
+    <button class="btn btn-info" id="copy" type="submit">Copiar</button>
   </div>
-  <div>
-    <h3 id="mensaje"></h3>
-  </div>
+  <h4 id="mensaje"></h4>
+</div>
   <script>
 
     function removeDuplicate(key){
